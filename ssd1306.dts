@@ -1,0 +1,30 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2708";
+
+	fragment@0 {
+		target = <&i2c_arm>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+
+			ssd1306: oled@3c {
+				compatible = "solomon,ssd1306fb-i2c";
+				reg = <0x3c>;
+				reset-gpios = <&gpio 4 1>;
+				//reset-active-low;
+				solomon,height = <64>;
+				solomon,width  = <128>;
+				solomon,prechargep1 = <0x01>;
+				solomon,prechargep2 = <0x0F>;
+				solomon,page-offset = <0>;
+				solomon,com-seq;
+			};
+		};
+		__overrides__ {
+		};
+	};
+};
