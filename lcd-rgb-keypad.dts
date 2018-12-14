@@ -1,0 +1,203 @@
+// Definitions for MCP23017 Gpio Extender from Microchip Semiconductor
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2708";
+
+
+	fragment@0 {
+		target = <&i2c_arm>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+/*	fragment@1 {
+		target = <&gpio>;
+		__overlay__ {
+			mcp23017_pins: mcp23017_pins {
+				brcm,pins = <4>;
+				brcm,function = <0>;
+			};
+		};
+	};
+*/
+
+	fragment@1 {
+		target = <&i2c_arm>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			
+			mcp23017: mcp@20 {
+				compatible = "microchip,mcp23017";
+				reg = <0x20>;
+				gpio-controller;
+				#gpio-cells = <2>;
+				//#interrupt-cells=<2>;
+				//interrupt-parent = <&gpio>;
+				//interrupts = <4 2>;
+				//interrupt-controller;
+				//microchip,irq-mirror;
+
+				status = "okay";
+
+				// pinctrl-names = "default";
+				// pinctrl-0 = <&gpiokeys &gpioleds &gpiolcd>;
+
+				gpiokeys: pinmux0 {
+					pins = "gpio0", "gpio1", "gpio2", "gpio3", "gpio4";
+					input-enable;
+				};
+				gpioleds: pinmux1 {
+					pins = "gpio6", "gpio7", "gpio8";
+					output-low;
+				};
+				gpiolcd: pinmux2 {
+					pins = "gpio5", "gpio9", "gpio10", "gpio11", "gpio12", "gpio13", "gpio14", "gpio15";
+					output-low;
+				};
+			};
+		};
+        __overrides__ {
+        };
+	};
+
+
+/*	__overrides__ {
+		gpiopin = <&mcp23017_pins>,"brcm,pins:0",
+				<&mcp23017>,"interrupts:0";
+		addr = <&mcp23017>,"reg:0";
+	};
+*/
+
+	// Display
+        fragment@2 {
+            target = <&mcp23017>;
+            __overlay__ {
+			auxdisplay {
+				compatible = "hit,hd44780";
+
+				// 0->GPIO_ACTIVE_HIGH
+				data-gpios =   <&mcp23017 12 0>, /*Port GPB4*/
+					       <&mcp23017 11 0>, /*Port GPB3*/
+					       <&mcp23017 10 0>, /*Port GPB2*/
+					       <&mcp23017  9 0>; /*Port GPB1*/
+				enable-gpios = <&mcp23017 13 0>; //Port GPB5
+				rw-gpios =     <&mcp23017 14 0>; //Port GPB6
+				rs-gpios =     <&mcp23017 15 0>; //Port GPB7
+				backlight-gpios = <&mcp23017 5 0>; //Port GPA5
+				
+				display-height-chars = <2>;
+				display-width-chars = <16>;		
+				
+				pinctrl-names = "default";
+				pinctrl-0 = <&gpiolcd>;
+
+				status = "okay";
+			};
+		};
+		__overrides__ {
+		};
+	};
+
+	// TODO RGB Led
+	// led R Port GPA6
+	// led G Port GPA7
+	// led B Port GPB0
+
+	fragment@3 {
+		target = <&leds>;
+		__overlay__ {
+			compatible = "gpio-leds";
+
+			pinctrl-names = "default";
+			pinctrl-0 = <&gpioleds>;
+
+			status = "okay";
+
+			led0: red {
+				label = "Red";
+				gpios = <&mcp23017 6 1>;
+				default-state = "off";
+			};
+
+			led1: green {
+				label = "Green";
+				gpios = <&mcp23017 7 1>;
+				default-state = "off";
+			};
+
+			led2: blue {
+				label = "Blue";
+				gpios = <&mcp23017 8 1>;
+				default-state = "off";
+			};
+		};
+		__overrides__ {
+		};
+	};
+
+
+
+	// TODO Buttons
+	// Button Select GPA0
+	// Button Right  GPA1
+	// Button Down   GPA2
+	// Button Up     GPA3
+	// Button Left   GPA4
+	
+	fragment@4 {
+		target-path = "/";
+		__overlay__ {
+        	keypad: keypad {
+				//compatible = "gpio-keys"; 	// NOT POSSIBLE BECAUSE Interrupt pins are not wired on my mcp23017 board
+				compatible = "gpio-keys-polled";
+				poll-interval = <100>;
+                #address-cells = <1>;
+                #size-cells = <0>;
+				autorepeat;
+				
+				pinctrl-names = "default";
+				pinctrl-0 = <&gpiokeys>;
+				
+				status = "okay";
+				
+				enter: enter {
+        			label = "GPIO Key Select";
+        			linux,code = <28>;
+        			gpios = <&mcp23017 0 1>;
+				};
+				
+				right: right {
+        			label = "GPIO Key RIGHT";
+        			linux,code = <106>;
+        			gpios = <&mcp23017 1 1>;
+				};
+				
+				down: down {
+        			label = "GPIO Key DOWN";
+        			linux,code = <108>;
+        			gpios = <&mcp23017 2 1>;
+				};
+				
+				up: up {
+        			label = "GPIO Key UP";
+        			linux,code = <103>;
+        			gpios = <&mcp23017 3 1>;
+				};
+		
+				left: left {
+					label = "GPIO Key LEFT";
+					linux,code = <105>;
+					gpios = <&mcp23017 4 1>;
+				};
+        	};
+		};
+		__overrides__ {
+		};
+	};
+
+};
