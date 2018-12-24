@@ -132,7 +132,7 @@
 				
 				enter: enter {
         			label = "GPIO Key Select";
-        			linux,code = <28>;
+        			linux,code = <28>; // Enter
         			gpios = <&mcp23017 0 1>;
 				};
 				
