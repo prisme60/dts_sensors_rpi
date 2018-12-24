@@ -48,16 +48,19 @@
 				// pinctrl-0 = <&gpiokeys &gpioleds &gpiolcd>;
 
 				gpiokeys: pinmux0 {
-					pins = "gpio0", "gpio1", "gpio2", "gpio3", "gpio4";
-					input-enable;
+					//function="keys";
+				 	pins = "gpio0", "gpio1", "gpio2", "gpio3", "gpio4";
+					bias-pull-up;
 				};
 				gpioleds: pinmux1 {
-					pins = "gpio6", "gpio7", "gpio8";
+					//function="leds";
+				 	pins = "gpio6", "gpio7", "gpio8";
 					output-low;
 				};
 				gpiolcd: pinmux2 {
-					pins = "gpio5", "gpio9", "gpio10", "gpio11", "gpio12", "gpio13", "gpio14", "gpio15";
-					output-low;
+					//function="auxdisplay";
+				 	pins = "gpio5", "gpio9", "gpio10", "gpio11", "gpio12", "gpio13", "gpio14", "gpio15";
+					bias-pull-up;
 				};
 			};
 		};
@@ -75,20 +78,20 @@
 
 	// Display
         fragment@2 {
-            target = <&mcp23017>;
+            target-path = "/";
             __overlay__ {
-			auxdisplay {
+			auxdisplay: auxdisplay {
 				compatible = "hit,hd44780";
 
 				// 0->GPIO_ACTIVE_HIGH
 				data-gpios =   <&mcp23017 12 0>, /*Port GPB4*/
-					       <&mcp23017 11 0>, /*Port GPB3*/
-					       <&mcp23017 10 0>, /*Port GPB2*/
-					       <&mcp23017  9 0>; /*Port GPB1*/
+					           <&mcp23017 11 0>, /*Port GPB3*/
+					           <&mcp23017 10 0>, /*Port GPB2*/
+					           <&mcp23017  9 0>; /*Port GPB1*/
 				enable-gpios = <&mcp23017 13 0>; //Port GPB5
 				rw-gpios =     <&mcp23017 14 0>; //Port GPB6
 				rs-gpios =     <&mcp23017 15 0>; //Port GPB7
-				backlight-gpios = <&mcp23017 5 0>; //Port GPA5
+				backlight-gpios = <&mcp23017 5 1>; //Port GPA5 (invert command)
 				
 				display-height-chars = <2>;
 				display-width-chars = <16>;		
@@ -119,19 +122,19 @@
 			status = "okay";
 
 			led0: red {
-				label = "Red";
+				label = "red";
 				gpios = <&mcp23017 6 1>;
 				default-state = "off";
 			};
 
 			led1: green {
-				label = "Green";
+				label = "green";
 				gpios = <&mcp23017 7 1>;
 				default-state = "off";
 			};
 
 			led2: blue {
-				label = "Blue";
+				label = "blue";
 				gpios = <&mcp23017 8 1>;
 				default-state = "off";
 			};
@@ -151,6 +154,7 @@
 	
 	fragment@4 {
 		target-path = "/";
+
 		__overlay__ {
         	keypad: keypad {
 				//compatible = "gpio-keys"; 	// NOT POSSIBLE BECAUSE Interrupt pins are not wired on my mcp23017 board
