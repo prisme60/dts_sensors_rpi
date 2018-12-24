@@ -27,34 +27,26 @@
 
 				status = "okay";
 
-				// pinctrl-names = "default";
-				// pinctrl-0 = <&gpiokeys &gpioleds &gpiolcd>;
-
 				gpiokeys: pinmux0 {
-					//function="keys";
 				 	pins = "gpio0", "gpio1", "gpio2", "gpio3", "gpio4";
 					bias-pull-up;
 				};
 				gpioleds: pinmux1 {
-					//function="leds";
 				 	pins = "gpio6", "gpio7", "gpio8";
 					bias-pull-up;
 				};
 				gpiolcd: pinmux2 {
-					//function="auxdisplay";
 				 	pins = "gpio5", "gpio9", "gpio10", "gpio11", "gpio12", "gpio13", "gpio14", "gpio15";
 					bias-pull-up;
 				};
 			};
 		};
-        __overrides__ {
-        };
 	};
 
 	// Display
-        fragment@1 {
-            target-path = "/";
-            __overlay__ {
+    fragment@1 {
+        target-path = "/";
+       	__overlay__ {
 			auxdisplay: auxdisplay {
 				compatible = "hit,hd44780";
 
@@ -77,15 +69,12 @@
 				status = "okay";
 			};
 		};
-		__overrides__ {
-		};
 	};
 
-	// TODO RGB Led
+	// RGB Led
 	// led R Port GPA6
 	// led G Port GPA7
 	// led B Port GPB0
-
 	fragment@2 {
 		target-path = "/";
 		__overlay__ {
@@ -116,19 +105,14 @@
 				};
 			};
 		};
-		__overrides__ {
-		};
 	};
 
-
-
-	// TODO Buttons
+	// TODO Buttons (need to be fixed and tested)
 	// Button Select GPA0
 	// Button Right  GPA1
 	// Button Down   GPA2
 	// Button Up     GPA3
 	// Button Left   GPA4
-	
 	fragment@3 {
 		target-path = "/";
 
@@ -176,8 +160,6 @@
 					gpios = <&mcp23017 4 1>;
 				};
         	};
-		};
-		__overrides__ {
 		};
 	};
 
