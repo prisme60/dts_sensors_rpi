@@ -6,30 +6,13 @@
 / {
 	compatible = "brcm,bcm2708";
 
-
 	fragment@0 {
-		target = <&i2c_arm>;
-		__overlay__ {
-			status = "okay";
-		};
-	};
-
-/*	fragment@1 {
-		target = <&gpio>;
-		__overlay__ {
-			mcp23017_pins: mcp23017_pins {
-				brcm,pins = <4>;
-				brcm,function = <0>;
-			};
-		};
-	};
-*/
-
-	fragment@1 {
 		target = <&i2c_arm>;
 		__overlay__ {
 			#address-cells = <1>;
 			#size-cells = <0>;
+
+			status = "okay";
 			
 			mcp23017: mcp@20 {
 				compatible = "microchip,mcp23017";
@@ -55,7 +38,7 @@
 				gpioleds: pinmux1 {
 					//function="leds";
 				 	pins = "gpio6", "gpio7", "gpio8";
-					output-low;
+					bias-pull-up;
 				};
 				gpiolcd: pinmux2 {
 					//function="auxdisplay";
@@ -68,16 +51,8 @@
         };
 	};
 
-
-/*	__overrides__ {
-		gpiopin = <&mcp23017_pins>,"brcm,pins:0",
-				<&mcp23017>,"interrupts:0";
-		addr = <&mcp23017>,"reg:0";
-	};
-*/
-
 	// Display
-        fragment@2 {
+        fragment@1 {
             target-path = "/";
             __overlay__ {
 			auxdisplay: auxdisplay {
@@ -111,32 +86,34 @@
 	// led G Port GPA7
 	// led B Port GPB0
 
-	fragment@3 {
-		target = <&leds>;
+	fragment@2 {
+		target-path = "/";
 		__overlay__ {
-			compatible = "gpio-leds";
+			expander_leds {
+				compatible = "gpio-leds";
 
-			pinctrl-names = "default";
-			pinctrl-0 = <&gpioleds>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&gpioleds>;
 
-			status = "okay";
+				status = "okay";
 
-			led0: red {
-				label = "red";
-				gpios = <&mcp23017 6 1>;
-				default-state = "off";
-			};
+				led0: red {
+					label = "red";
+					gpios = <&mcp23017 6 1>;
+					default-state = "off";
+				};
 
-			led1: green {
-				label = "green";
-				gpios = <&mcp23017 7 1>;
-				default-state = "off";
-			};
+				led1: green {
+					label = "green";
+					gpios = <&mcp23017 7 1>;
+					default-state = "off";
+				};
 
-			led2: blue {
-				label = "blue";
-				gpios = <&mcp23017 8 1>;
-				default-state = "off";
+				led2: blue {
+					label = "blue";
+					gpios = <&mcp23017 8 1>;
+					default-state = "off";
+				};
 			};
 		};
 		__overrides__ {
@@ -152,7 +129,7 @@
 	// Button Up     GPA3
 	// Button Left   GPA4
 	
-	fragment@4 {
+	fragment@3 {
 		target-path = "/";
 
 		__overlay__ {
